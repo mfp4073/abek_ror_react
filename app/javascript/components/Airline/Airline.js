@@ -2,6 +2,7 @@ import React, { useState, useEffect, Fragment } from 'react';
 import axios from 'axios';
 import Header from './Header';
 import ReviewForm from './ReviewForm';
+import Review from './Review';
 import styled from 'styled-components';
 
 const Wrapper = styled.div`
@@ -24,27 +25,64 @@ const Main = styled.div`
 `
 
 const Airline = (props) => {
-
   const [airline, setAirline] = useState({});
   const [review, setReview] = useState({});
   const [loaded, setLoaded] = useState(false);
 
   useEffect(() => {
-    console.log("PROPS: ", props)
     const slug = props.match.params.slug;
     const url = `/api/v1/airlines/${slug}`
     // api/v1/airlines/unite-airlines
     // airlines/united-airliens
     //http://localhost:3000/api/v1/airlines/united-airlines
     axios.get(url)
-    // .then(response => console.log("RETURNED: ", response) )
     .then(response => {
-      console.log("RETURNED: ", response.data)
       setAirline(response.data);
       setLoaded(true);
     })
     .catch(response => console.log(response) )
   }, [])
+
+  const handleChange = (e) => {
+    e.preventDefault();
+    // console.log("name: ", e.target.name, "val: ", e.target.value)
+    setReview({...review, [e.target.name]: e.target.value})
+  }
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    const csrfToken = document.querySelector(`[name=csrf-token]`).content;
+    axios.defaults.headers.common['X-CSRF-TOKEN'] = csrfToken;
+
+    const airline_id = airline.data.id
+    axios.post(`/api/v1/reviews`, {review, airline_id})
+    .then(response => {
+      const included = [...airline.included, response.data.data];
+      setAirline({...airline, included});
+      setReview({title: '', description: '', score: 0});
+    })
+    .catch(response => {})
+    }
+
+    const setRating = (score, e) => {
+      e.preventDefault();
+      setReview({...review, score})
+    }
+
+
+  let reviews
+
+  if( loaded && airline.included ) {
+    reviews = airline.included.map( (item, index) => {
+      return (
+        <Review
+          key={index}
+          attributes={item.attributes}
+        />
+      )
+    })
+  }
+
 
   return (
     <Wrapper>
@@ -58,10 +96,16 @@ const Airline = (props) => {
                   reviews={airline.included}
                 />
             </Main>
-          <div className="reviews"></div>
+            {reviews}
           </Column>
           <Column>
-            <ReviewForm></ReviewForm>
+            <ReviewForm
+              handleSubmit={handleSubmit}
+              handleChange={handleChange}
+              setRating={setRating}
+              attributes={airline.data.attributes}
+              review={review}
+            />
           </Column>
         </Fragment>
       }

@@ -37,10 +37,10 @@ const Airlines = () => {
     .catch( response => console.log(response))
   }, [airlines.length])
 
-
-  const grid = airlines.map( airline => {
+  const grid = airlines.map( (airline, index) => {
     return (
       <Airline
+        key={index}
         attributes={airline.attributes}
         attributes={airline.attributes}
       />
