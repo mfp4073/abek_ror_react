@@ -133,7 +133,8 @@ const ReviewForm = (props) => {
           value={score}
           checked={props.review.score == score}
           name="rating"
-          onChange={() => console.log('selected: ', score)} id={`rating-${score}`}
+          onChange={props.handleChange}
+          id={`rating-${score}`}
         />
         <label onClick={props.setRating.bind(this, score)}></label>
       </Fragment>
@@ -145,10 +146,18 @@ const ReviewForm = (props) => {
       <form onSubmit={props.handleSubmit}>
         <ReviewHeadline>Have an experience with {props.attributes.name}? Share your experience</ReviewHeadline>
         <Field>
-          <input onChange={props.handleChange} value={props.review.title} type="text" name="title" placeholder="Revew Title"/>
+          <input
+            onChange={props.handleChange}
+            value={props.review.title || ""}
+            type="text" name="title"
+            placeholder="Revew Title"/>
         </Field>
         <Field>
-          <input onChange={props.handleChange} value={props.review.description} type="text" name="description" placeholder="Revew Despriction"/>
+          <input
+            onChange={props.handleChange}
+            value={props.review.description || ""}
+            type="text" name="description"
+            placeholder="Revew Despriction"/>
         </Field>
         <Field>
           <RatingContainer>
