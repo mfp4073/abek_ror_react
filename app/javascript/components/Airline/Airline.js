@@ -7,6 +7,7 @@ import styled from 'styled-components';
 
 const Wrapper = styled.div`
   margin-left: auto;
+  margin-right: 10px;
   margin-right: auto;
   display: grid;
   grid-template-columns: repeat(2, 1fr);
